@@ -1,0 +1,5 @@
+X-RapidAPI-Key: 'API_KEY',  #API Key
+X-RapidAPI-Host: 'fresh-linkedin-profile-data.p.rapidapi.com', #Rapid Api Host
+End-Point: 'get-linkedin-profile',
+Request-Type: 'GET',
+First-Param: 'linkedin_url'
