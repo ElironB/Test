@@ -1,39 +1,38 @@
-from pydantic import BaseModel, Field 
+from pydantic import BaseModel, Field
 from typing import Type
 from superagi.tools.base_tool import BaseTool
 import requests
 
 class LinkedInProfileInput(BaseModel):
-    linkedin_url: str = Field(..., description="LinkedIn profile URL to fetch data from DO NOT make up any url")   
+    linkedin_url: str = Field(..., description="LinkedIn profile URL to fetch data from")
+
 class LinkedInProfileTool(BaseTool):
     """
-    Execute LinkedIn Profile data extraction tool
-    
-    Args:
-        linkedin_url : LinkedIn profile URL to fetch data from
-    Returns:
-       Profile data from the api request.
-
+    LinkedIn Profile Tool
     """
     name: str = "LinkedIn Profile Tool"
     args_schema: Type[BaseModel] = LinkedInProfileInput
     description: str = "Fetches data from a LinkedIn profile"
 
-    def _execute(self, args: LinkedInProfileInput): 
-        linkedin_url = args.linkedin_url
+    def _execute(self, linkedin_url: str = None):
         rapid_api_key = self.get_tool_config('X-RapidAPI-Key')
-        rapid_host = self.get_tool_config('X-RapidAPI-Host')
-        end_point = self.get_tool_config('End-Point')
-        request_type = self.get_tool_config('Request-Type')
-        first_param = self.get_tool_config('First-Param')
-        request_type = request_type.lower()
-        url = "https://hook.eu2.make.com/fs3b86gb8pap98gl347t3e7pzrbtq9jm"
+
+        url = "https://fresh-linkedin-profile-data.p.rapidapi.com/get-linkedin-profile"
         headers = {
             "X-RapidAPI-Key": rapid_api_key,
-            "X-RapidAPI-Host": rapid_host
+            "X-RapidAPI-Host": "fresh-linkedin-profile-data.p.rapidapi.com"
         }
-
-        querystring = {first_param: linkedin_url}
+        querystring = {"linkedin_url": linkedin_url}
 
         response = requests.get(url, headers=headers, params=querystring)
-        return response.json()
+        response = response.json()
+        headline = response['data']['headline']
+        about = response['data']['about']
+        experiences = response['data']['experiences']
+
+        result_data = {
+            'headline': headline,
+            'about': about,
+            'experiences': experiences
+        }
+        return result_data
